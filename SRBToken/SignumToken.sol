@@ -6,11 +6,12 @@ import "./oldContracts/contracts/interfaces/IGovernance.sol";
 import "./oldContracts/contracts/tellor3/TellorStorage.sol";
 
 /**
- @author Avantgarde Blockchain Solutions
+ @author Tetra.win
  @title BaseToken
  @dev Contains the methods related to ERC20 transfers, allowance, and storage
 */
-contract SignumToken is TellorStorage, TellorVars {
+contract SignumTestToken is TellorStorage, TellorVars {
+    address public owner;
     // Events
     event Approval(
         address indexed _owner,
@@ -21,6 +22,7 @@ contract SignumToken is TellorStorage, TellorVars {
 
     constructor(uint256 _preMint) {
         _doMint(msg.sender, _preMint);
+        owner = msg.sender;
     }
 
     // Functions
@@ -185,14 +187,14 @@ contract SignumToken is TellorStorage, TellorVars {
      * @dev Allows users to access the token's name
      */
     function name() external pure returns (string memory) {
-        return "Signum Tributes";
+        return "Signum Test Token";
     }
 
     /**
      * @dev Allows users to access the token's symbol
      */
     function symbol() external pure returns (string memory) {
-        return "SRB";
+        return "STT";
     }
 
     /**
@@ -276,5 +278,14 @@ contract SignumToken is TellorStorage, TellorVars {
             ];
             oldCheckPoint.value = _value;
         }
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not the contract owner");
+        _;
+    }
+
+    function selfDestruct() external onlyOwner {
+        selfdestruct(payable(owner));
     }
 }

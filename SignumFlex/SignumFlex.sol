@@ -4,14 +4,14 @@ pragma solidity 0.8.3;
 import "./interfaces/IERC20.sol";
 
 /**
- @author Avantgarde Blockchain Solutions
+ @author Tetra.win
  @title SignumFlex
  @dev This is a streamlined Signum oracle system which handles staking, reporting,
  * slashing, and user data getters in one contract. This contract is controlled
  * by a single address known as 'governance', which could be an externally owned
  * account or a contract, allowing for a flexible, modular design.
 */
-contract HappyTimesFunHouse {
+contract SignumFlex {
     // Storage
     IERC20 public token; // token used for staking and rewards
     address public governance; // address with ability to remove values and slash reporters

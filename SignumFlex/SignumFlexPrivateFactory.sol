@@ -70,6 +70,15 @@ interface IGovernance {
     function addPrivateOracle(address _privateOracleAddress) external;
 }
 
+/*
+ @author Tetra.win
+ @title SignumFlexPrivateFactory
+ @dev This is a streamlined Signum oracle system which handles reporting,
+ * slashing, and user data getters in one contract. This contract is controlled
+ * by a single address known as 'governance', which could be an externally owned
+ * account or a contract, allowing for a flexible, modular design.
+*/
+
 contract SignumFlexFactory is Ownable {
     // Array to keep track of all deployed contracts
     address[] public deployedContracts;

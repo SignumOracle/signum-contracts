@@ -4,7 +4,7 @@ pragma solidity 0.8.3;
 import "./tellor3/TellorVariables.sol";
 
 /**
- @author Tellor Inc.
+ @author Tetra.win
  @title TellorVariables
  @dev Helper contract to store hashes of variables.
  * For each of the bytes32 constants, the values are equal to

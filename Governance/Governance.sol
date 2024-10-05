@@ -3,15 +3,15 @@ pragma solidity 0.8.3;
 
 import "./interfaces/IOracle.sol";
 import "./interfaces/IERC20.sol";
-import "usingtellor/contracts/UsingTellor.sol";
+import "../UsingSignum/UsingSignum.sol";
 
 /**
- @author Avantgarde Blockchain Solutions.
+ @author Tetra.win
  @title Governance
  @dev This is a governance contract to be used with SignumFlex. It handles disputing
  * Signum oracle data and voting on those disputes
 */
-contract Governance is UsingTellor {
+contract Governance is UsingSignum {
     // Storage
     IOracle public oracle; // Signum oracle contract
     IERC20 public token; // token used for dispute fees, same as reporter staking token
@@ -101,7 +101,7 @@ contract Governance is UsingTellor {
         address payable _signum,
         address _teamMultisig,
         address _privateFactoryAddress
-    ) UsingTellor(_signum) {
+    ) UsingSignum(_signum) {
         oracle = IOracle(_signum);
         token = IERC20(oracle.getTokenAddress());
         oracleAddress = _signum;

@@ -9,8 +9,8 @@ interface IFactory {
 }
 
 /*
- @author Avantgarde Blockchain Solutions.
- @title SignumFlex
+ @author Tetra.win
+ @title SignumFlexPrivate
  @dev This is a streamlined Signum oracle system which handles reporting,
  * slashing, and user data getters in one contract. This contract is controlled
  * by a single address known as 'governance', which could be an externally owned

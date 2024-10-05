@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.3;
 
-import {UsingTellor} from "usingtellor/contracts/UsingTellor.sol";
+import {UsingSignum} from "../UsingSignum/UsingSignum.sol";
 import {IERC20} from "./interfaces/IERC20.sol";
 import "./interfaces/IQueryDataStorage.sol";
 
@@ -11,7 +11,7 @@ import "./interfaces/IQueryDataStorage.sol";
  @dev This is a contract for automatically paying for Tellor oracle data at
  * specific time intervals, as well as one time tips.
 */
-contract AutopayTest is UsingTellor {
+contract Autopay is UsingSignum {
     // Storage
     IERC20 public token; // TRB token address
     IQueryDataStorage public queryDataStorage; // Query data storage contract
@@ -106,7 +106,7 @@ contract AutopayTest is UsingTellor {
         address _queryDataStorage,
         address _feeReceiver,
         uint256 _fee
-    ) UsingTellor(_tellor) {
+    ) UsingSignum(_tellor) {
         token = IERC20(sttTokenAddress);
         queryDataStorage = IQueryDataStorage(_queryDataStorage);
         feeReceiver = _feeReceiver;
@@ -221,8 +221,9 @@ contract AutopayTest is UsingTellor {
                 _cumulativeReward - ((_cumulativeReward * fee) / 1000)
             )
         );
-        token.approve(address(tellor), (_cumulativeReward * fee) / 1000);
-        tellor.addStakingRewards((_cumulativeReward * fee) / 1000);
+        //token.approve(address(tellor), (_cumulativeReward * fee) / 1000);
+        //tellor.addStakingRewards((_cumulativeReward * fee) / 1000);
+        tellor.transfer(feeReceiver, (_cumulativeReward * fee) / 1000);
         emit TipClaimed(_feedId, _queryId, _cumulativeReward, msg.sender);
     }
 

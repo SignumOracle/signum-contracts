@@ -2,7 +2,7 @@
 pragma solidity 0.8.3;
 
 /**
- @author Tellor Inc.
+ @author Tetra.win
  @title TellorFlex
  @dev This is a streamlined Tellor oracle system which handles staking, reporting,
  * slashing, and user data getters in one contract. This contract is controlled
