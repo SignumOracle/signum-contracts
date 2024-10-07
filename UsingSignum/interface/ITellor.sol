@@ -9,13 +9,5 @@ interface ITellor {
     function getDataBefore(bytes32 _queryId, uint256 _timestamp) external  view  returns(bool _ifRetrieve, bytes memory _value, uint256 _timestampRetrieved);
     function getIndexForDataBefore(bytes32 _queryId, uint256 _timestamp) external view returns (bool _found, uint256 _index);
     function isInDispute(bytes32 _queryId, uint256 _timestamp) external view returns (bool);
-    function transfer(address _to, uint256 _amount)
-        external
-        returns (bool success);
-
-    function transferFrom(
-        address _from,
-        address _to,
-        uint256 _amount
-    ) external returns (bool success);
+    function addStakingRewards(uint256 _amount) external;
 }

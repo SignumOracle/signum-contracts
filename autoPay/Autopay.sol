@@ -6,7 +6,7 @@ import {IERC20} from "./interfaces/IERC20.sol";
 import "./interfaces/IQueryDataStorage.sol";
 
 /**
- @author Tellor Inc.
+ @author Tetra.win
  @title Autopay
  @dev This is a contract for automatically paying for Tellor oracle data at
  * specific time intervals, as well as one time tips.
@@ -104,12 +104,11 @@ contract Autopay is UsingSignum {
         address payable _tellor,
         address sttTokenAddress,
         address _queryDataStorage,
-        address _feeReceiver,
         uint256 _fee
     ) UsingSignum(_tellor) {
         token = IERC20(sttTokenAddress);
         queryDataStorage = IQueryDataStorage(_queryDataStorage);
-        feeReceiver = _feeReceiver;
+        feeReceiver = msg.sender;
         fee = _fee;
     }
 
@@ -133,15 +132,20 @@ contract Autopay is UsingSignum {
                 _timestamps[_i]
             );
         }
+        
         require(
             token.transfer(
                 msg.sender,
                 _cumulativeReward - ((_cumulativeReward * fee) / 1000)
             )
         );
-        //token.approve(address(tellor), (_cumulativeReward * fee) / 1000);
-        //tellor.addStakingRewards((_cumulativeReward * fee) / 1000);
-        tellor.transfer(feeReceiver, (_cumulativeReward * fee) / 1000);
+        require(
+            token.transfer(
+                feeReceiver, 
+                (_cumulativeReward * fee) / 1000
+            )
+        );
+
         if (getCurrentTip(_queryId) == 0) {
             if (queryIdsWithFundingIndex[_queryId] != 0) {
                 uint256 _idx = queryIdsWithFundingIndex[_queryId] - 1;
@@ -221,9 +225,9 @@ contract Autopay is UsingSignum {
                 _cumulativeReward - ((_cumulativeReward * fee) / 1000)
             )
         );
-        //token.approve(address(tellor), (_cumulativeReward * fee) / 1000);
-        //tellor.addStakingRewards((_cumulativeReward * fee) / 1000);
-        tellor.transfer(feeReceiver, (_cumulativeReward * fee) / 1000);
+
+        token.transfer(feeReceiver, (_cumulativeReward * fee) / 1000);
+
         emit TipClaimed(_feedId, _queryId, _cumulativeReward, msg.sender);
     }
 

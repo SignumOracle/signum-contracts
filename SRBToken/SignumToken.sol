@@ -7,10 +7,10 @@ import "./oldContracts/contracts/tellor3/TellorStorage.sol";
 
 /**
  @author Tetra.win
- @title BaseToken
+ @title SignumTributes
  @dev Contains the methods related to ERC20 transfers, allowance, and storage
 */
-contract SignumTestToken is TellorStorage, TellorVars {
+contract SignumTributes is TellorStorage, TellorVars {
     address public owner;
     // Events
     event Approval(

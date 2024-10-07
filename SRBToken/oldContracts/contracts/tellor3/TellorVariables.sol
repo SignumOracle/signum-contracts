@@ -2,7 +2,7 @@
 pragma solidity >=0.7.4;
 
 /**
- @author Tellor Inc.
+ @author Tetra.win
  @title TellorVariables
  @dev Helper contract to store hashes of variables
 */
