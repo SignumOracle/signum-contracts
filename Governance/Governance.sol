@@ -11,7 +11,7 @@ import "../UsingSignum/UsingSignum.sol";
  @dev This is a governance contract to be used with SignumFlex. It handles disputing
  * Signum oracle data and voting on those disputes
 */
-contract Governance is UsingSignum {
+contract GovernanceTest is UsingSignum {
     // Storage
     IOracle public oracle; // Signum oracle contract
     IERC20 public token; // token used for dispute fees, same as reporter staking token
@@ -193,6 +193,83 @@ contract Governance is UsingSignum {
             );
             if (_voteRounds.length > 4) {
                 _disputeFee = oracle.getStakeAmount();
+            } else {
+                _disputeFee = _disputeFee * 2 ** (_voteRounds.length - 1);
+            }
+            _thisDispute.slashedAmount = disputeInfo[_voteRounds[0]]
+                .slashedAmount;
+            _thisDispute.value = disputeInfo[_voteRounds[0]].value;
+        }
+        _thisVote.fee = _disputeFee;
+        voteCount++;
+        require(
+            token.transferFrom(msg.sender, address(this), _disputeFee),
+            "Fee must be paid"
+        ); // This is the dispute fee. Returned if dispute passes
+        emit NewDispute(_disputeId, _queryId, _timestamp, _reporter);
+    }
+
+    /**
+     * @dev Initializes a dispute/vote in the system
+     * @param _queryId being disputed
+     * @param _timestamp being disputed
+     */
+    function beginDisputePrivate(IOracle _oracle, bytes32 _queryId, uint256 _timestamp) external {
+        require(privateOracleAddresses[address(_oracle)], "Oracle address must be a private signum oracle.");
+        // Ensure value actually exists
+        address _reporter = _oracle.getReporterByTimestamp(_queryId, _timestamp);
+        require(_reporter != address(0), "no value exists at given timestamp");
+        bytes32 _hash = keccak256(abi.encodePacked(_queryId, _timestamp));
+        // Push new vote round
+        uint256 _disputeId = voteCount + 1;
+        uint256[] storage _voteRounds = voteRounds[_hash];
+        _voteRounds.push(_disputeId);
+
+        // Create new vote and dispute
+        Vote storage _thisVote = voteInfo[_disputeId];
+        Dispute storage _thisDispute = disputeInfo[_disputeId];
+
+        // Initialize dispute information - query ID, timestamp, value, etc.
+        _thisDispute.queryId = _queryId;
+        _thisDispute.timestamp = _timestamp;
+        _thisDispute.disputedReporter = _reporter;
+        // Initialize vote information - hash, initiator, block number, etc.
+        _thisVote.identifierHash = _hash;
+        _thisVote.initiator = msg.sender;
+        _thisVote.blockNumber = block.number;
+        _thisVote.startDate = block.timestamp;
+        _thisVote.voteRound = _voteRounds.length;
+        disputeIdsByReporter[_reporter].push(_disputeId);
+        uint256 _disputeFee = getDisputeFee();
+        if (_voteRounds.length == 1) {
+            require(
+                block.timestamp - _timestamp < 12 hours,
+                "Dispute must be started within reporting lock time"
+            );
+            openDisputesOnId[_queryId]++;
+            // calculate dispute fee based on number of open disputes on query ID
+            if (openDisputesOnId[_queryId] > 4) {
+                _disputeFee = _oracle.getStakeAmount();
+            } else {
+                _disputeFee =
+                    _disputeFee *
+                    2 ** (openDisputesOnId[_queryId] - 1);
+            }
+            // slash a single stakeAmount from reporter
+            _thisDispute.slashedAmount = _oracle.slashReporter(
+                _reporter,
+                address(this)
+            );
+            _thisDispute.value = _oracle.retrieveData(_queryId, _timestamp);
+            _oracle.removeValue(_queryId, _timestamp);
+        } else {
+            uint256 _prevId = _voteRounds[_voteRounds.length - 2];
+            require(
+                block.timestamp - voteInfo[_prevId].tallyDate < 1 days,
+                "New dispute round must be started within a day"
+            );
+            if (_voteRounds.length > 4) {
+                _disputeFee = _oracle.getStakeAmount();
             } else {
                 _disputeFee = _disputeFee * 2 ** (_voteRounds.length - 1);
             }

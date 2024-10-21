@@ -79,7 +79,7 @@ interface IGovernance {
  * account or a contract, allowing for a flexible, modular design.
 */
 
-contract SignumFlexFactory is Ownable {
+contract SignumFlexPrivateFactory is Ownable {
     // Array to keep track of all deployed contracts
     address[] public deployedContracts;
     mapping(address => bool) public isPrivateOracle;
@@ -94,7 +94,7 @@ contract SignumFlexFactory is Ownable {
     uint256 public stakeLockTime = 365 days; // 1 year
 
     // Contracts
-    IGovernance public governance = IGovernance(address(0x2124F2773425BCb252A495E446e6Cb738AAc57cd));
+    IGovernance public governance = IGovernance(address(0x237a21b1bb4d0283c7590EA76e3Cc8B47985C9Ce));
 
     // Events
     event PrivateOracleDeployed(address indexed newContractAddress, address indexed deployer);
@@ -116,7 +116,7 @@ contract SignumFlexFactory is Ownable {
         // Store the address of the new contract in the deployedContracts array
         deployedContracts.push(address(newContract));
         isPrivateOracle[address(newContract)] = true;
-        governance.addPrivateOracle(address(newContract));
+        //governance.addPrivateOracle(address(newContract));
 
         // Emit the ContractDeployed event
         emit PrivateOracleDeployed(address(newContract), msg.sender);
