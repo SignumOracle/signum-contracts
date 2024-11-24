@@ -116,7 +116,7 @@ contract SignumFlexPrivateFactory is Ownable {
         // Store the address of the new contract in the deployedContracts array
         deployedContracts.push(address(newContract));
         isPrivateOracle[address(newContract)] = true;
-        //governance.addPrivateOracle(address(newContract));
+        governance.addPrivateOracle(address(newContract));
 
         // Emit the ContractDeployed event
         emit PrivateOracleDeployed(address(newContract), msg.sender);
@@ -161,6 +161,8 @@ contract SignumFlexPrivateFactory is Ownable {
     function updateStakeRequirements(uint256 _stakeAmount, uint256 _stakeLockTime) external onlyOwner {
         stakeAmount = _stakeAmount;
         stakeLockTime = _stakeLockTime;
+        require(stakeAmount <= 75000e18, "75K Max");
+        require(stakeLockTime <= 315360000, "10 Year max.");
         emit StakeRequirementsUpdated(_stakeAmount, _stakeLockTime);
     }
 }

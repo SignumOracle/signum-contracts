@@ -136,31 +136,41 @@ contract SignumFlexPrivate {
         StakeInfo storage _staker = stakerDetails[_reporter];
         uint256 _stakedBalance = _staker.stakedBalance;
         uint256 _lockedBalance = _staker.lockedBalance;
+        uint256 factoryStakeAmount = IFactory(factory).stakeAmount();
+
         require(_stakedBalance + _lockedBalance > 0, "zero staker balance");
-        if (_lockedBalance >= IFactory(factory).stakeAmount()) {
-            // if locked balance is at least stakeAmount, slash from locked balance
-            _slashAmount = IFactory(factory).stakeAmount();
-            _staker.lockedBalance -= IFactory(factory).stakeAmount();
-            toWithdraw -= IFactory(factory).stakeAmount();
-        } else if (_lockedBalance + _stakedBalance >= IFactory(factory).stakeAmount()) {
-            // if locked balance + staked balance is at least stakeAmount,
-            // slash from locked balance and slash remainder from staked balance
-            _slashAmount = IFactory(factory).stakeAmount();
+
+        if (_lockedBalance >= factoryStakeAmount) {
+            _slashAmount = factoryStakeAmount;
+            _staker.lockedBalance -= factoryStakeAmount;
+            toWithdraw -= factoryStakeAmount;
+        } else if (_lockedBalance + _stakedBalance >= factoryStakeAmount) {
+            uint256 remainder = factoryStakeAmount - _lockedBalance;
+
+            // Ensure there won't be an underflow
+            require(remainder <= _stakedBalance, "invalid staked balance for slashing");
+
+            _slashAmount = factoryStakeAmount;
+
             _updateStakeAndPayRewards(
                 _reporter,
-                _stakedBalance - (IFactory(factory).stakeAmount() - _lockedBalance)
+                _stakedBalance - remainder
             );
             toWithdraw -= _lockedBalance;
             _staker.lockedBalance = 0;
         } else {
-            // if sum(locked balance + staked balance) is less than stakeAmount,
-            // slash sum
             _slashAmount = _stakedBalance + _lockedBalance;
+
+            require(toWithdraw >= _lockedBalance, "toWithdraw underflow");
+            
             toWithdraw -= _lockedBalance;
             _updateStakeAndPayRewards(_reporter, 0);
             _staker.lockedBalance = 0;
         }
-        require(token.transfer(governanceEscrow, _slashAmount));
+
+        require(_slashAmount > 0, "nothing to slash");
+        require(token.transfer(governanceEscrow, _slashAmount), "transfer failed");
+
         emit ReporterSlashed(_reporter, governanceEscrow, _slashAmount);
     }
 

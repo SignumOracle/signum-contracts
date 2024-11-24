@@ -6,7 +6,7 @@ import {IERC20} from "./interfaces/IERC20.sol";
 import "./interfaces/IQueryDataStorage.sol";
 
 /**
- @author Tetra.win
+ @author Tellor Inc.
  @title Autopay
  @dev This is a contract for automatically paying for Tellor oracle data at
  * specific time intervals, as well as one time tips.

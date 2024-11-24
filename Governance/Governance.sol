@@ -11,7 +11,7 @@ import "../UsingSignum/UsingSignum.sol";
  @dev This is a governance contract to be used with SignumFlex. It handles disputing
  * Signum oracle data and voting on those disputes
 */
-contract GovernanceTest is UsingSignum {
+contract Governance is UsingSignum {
     // Storage
     IOracle public oracle; // Signum oracle contract
     IERC20 public token; // token used for dispute fees, same as reporter staking token
