@@ -284,8 +284,4 @@ contract SignumTributes is TellorStorage, TellorVars {
         require(msg.sender == owner, "Not the contract owner");
         _;
     }
-
-    function selfDestruct() external onlyOwner {
-        selfdestruct(payable(owner));
-    }
 }
